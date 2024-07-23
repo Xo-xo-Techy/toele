@@ -92,7 +92,7 @@ async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_
         return
 
     
-    app.send_message(message.chat.id,
+    await app.send_message(message.chat.id,
         f"__Hello {message.from_user.mention}, Watch IPTV streams right in Telegram App, send name of the channel bot will respond with available streams to watch, There are 6000+ online streams available from all over the world all the time.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
 
 @app.on_message(filters.command(["about"]))
@@ -134,8 +134,7 @@ async def tvname(client: pyrogram.client.Client, message: pyrogram.types.message
     user_mention = message.from_user.mention
     search = message.text
     is_member = await is_user_member(client, user_id)
-    await search.delete()
-
+    
     if not is_member:
         join_button1 = InlineKeyboardButton("CHANNEL 1", url="https://t.me/movie_time_botonly")
         join_button2 = InlineKeyboardButton("CHANNEL 2", url="https://t.me/+ExBm8lEipxRkMTA1")

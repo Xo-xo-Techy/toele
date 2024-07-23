@@ -1,7 +1,12 @@
 from pyrogram.types import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
 import os, pyrogram, json
 from pyrogram import Client, filters
+from pyrogram.enums import ChatMemberStatus
 from requests import get
+import logging
+import asyncio
+
+logging.basicConfig(level=logging.INFO)
 
 # conifg
 with open('config.json', 'r') as f: CONFIGDATA = json.load(f)
@@ -10,6 +15,19 @@ with open('config.json', 'r') as f: CONFIGDATA = json.load(f)
 TOKEN = os.environ.get("TOKEN") or CONFIGDATA.get("TOKEN", "")
 HASH = os.environ.get("HASH") or CONFIGDATA.get("HASH", "")
 ID = os.environ.get("ID") or CONFIGDATA.get("ID", "")
+fsub_id = environ.get('FSUB_ID', '-1001678093514')
+if len(fsub_id) == 0:
+    logging.error("FSUB_ID variable is missing! Exiting now")
+    exit(1)
+else:
+    fsub_id = int(fsub_id)
+
+fsub_id2 = environ.get('FSUB_ID2', '-1001855342933')
+if len(fsub_id2) == 0:
+    logging.error("FSUB_ID2 variable is missing! Exiting now")
+    exit(1)
+else:
+    fsub_id2 = int(fsub_id2)
 app = Client("my_bot", api_id=ID, api_hash=HASH, bot_token=TOKEN)
 
 # channles
@@ -39,16 +57,95 @@ STREAMS = refresh()
 COLMS = 2
 ROWS = 15
 
+async def is_user_member(client, user_id):
+    try:
+        member = await client.get_chat_member(fsub_id, user_id)
+        member = await client.get_chat_member(fsub_id2, user_id)
+        logging.info(f"User {user_id} membership status: {member.status}")
+        if member.status in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
+            return True
+        else:
+            return False
+    except Exception as e:
+        logging.error(f"Error checking membership status for user {user_id}: {e}")
+        return False
 @app.on_message(filters.command(["start"]))
-def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+    user_id = message.from_user.id
+    first_name = message.from_user.first_name
+    last_name = message.from_user.last_name
+    username = message.from_user.username
+    user_mention = message.from_user.mention
+    is_member = await is_user_member(client, user_id)
+    
+    join_button = InlineKeyboardButton("ᴊᴏɪɴ ❤️🚀", url="https://t.me/movie_time_botonly")
+    developer_button = InlineKeyboardButton("ᴅᴇᴠᴇʟᴏᴘᴇʀ ⚡️", url="https://t.me/fligher")
+    bt_button=InlineKeyboardButton("Bot List🤖",url="https://te.legra.ph/TRUMBOTS-BOTS-LIST-06-01")
+    reply_markup = InlineKeyboardMarkup([[join_button, developer_button],[bt_button]])
+
+    
+    if not is_member:
+        join_button1 = InlineKeyboardButton("CHANNEL 1", url="https://t.me/movie_time_botonly")
+        join_button2 = InlineKeyboardButton("CHANNEL 2", url="https://t.me/+ExBm8lEipxRkMTA1")
+        reply_markup = InlineKeyboardMarkup([[join_button1],[join_button2]])
+        await message.reply_text("😈ʏᴏᴜ ᴍᴜsᴛ ᴊᴏɪɴ ᴍʏ ᴄʜᴀɴɴᴇʟs ᴛᴏ ᴜsᴇ ᴍᴇ😈.", reply_markup=reply_markup)
+        return
+
+    
     app.send_message(message.chat.id,
-        f"__Hello {message.from_user.mention}, Watch IPTV streams right in Telegram App, send name of the channel bot will respond with available streams to watch, There are 6000+ online streams available from all over the world all the time.\n\nSource: https://github.com/iptv-org/api__", reply_to_message_id=message.id, disable_web_page_preview=True)
+        f"__Hello {message.from_user.mention}, Watch IPTV streams right in Telegram App, send name of the channel bot will respond with available streams to watch, There are 6000+ online streams available from all over the world all the time.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
+
+@app.on_message(filters.command(["about"]))
+async def about_command(client,message):
+    text = f"""
+🌀 ᴄʜᴀɴɴᴇʟ : <a href="https://t.me/MOVIE_Time_BotOnly">​🇹​​🇷​​🇺​​🇲​​🇧​​🇴​​🇹​​🇸</a>
+🌺 ʜᴇʀᴏᴋᴜ : <a href="https://heroku.com/">ʜᴇʀᴏᴋᴜ</a>
+📑 ʟᴀɴɢᴜᴀɢᴇ : <a href="https://www.python.org/">ᴘʏᴛʜᴏɴ 3.10.5</a>
+🇵🇲 ғʀᴀᴍᴇᴡᴏʀᴋ : <a href="https://docs.pyrogram.org/">ᴘʏʀᴏɢʀᴀᴍ 2.0.30</a>
+👲 ᴅᴇᴠᴇʟᴏᴘᴇʀ : <a href="https://t.me/fligher">​🇲​​🇾​​🇸​​🇹​​🇪​​🇷​​🇮​​🇴​</a></b>
+"""
+
+    # Buttons
+    buttons = [
+        [
+            InlineKeyboardButton('👥 Group', url=f"https://t.me/trumbotchat"),
+            InlineKeyboardButton('TRUMBOTS', url=f"https://t.me/movie_time_botonly")
+            ],[
+            InlineKeyboardButton('❤️Me', url=f"https://t.me/fligher"),
+            InlineKeyboardButton('Bot Lists 🤖', url=f"https://te.legra.ph/TRUMBOTS-BOTS-LIST-06-01"),
+            ]
+    ]
+    x=await message.reply_photo(
+        photo="https://th.bing.com/th/id/OIG4.kIKwAP6q4rN21rOhb71Z?pid=ImgGn",
+        caption=text,
+        reply_markup=InlineKeyboardMarkup(buttons)
+    )
+    await asyncio.sleep(10)
+    await message.delete()
+    await x.delete()
 
 # text
 @app.on_message(filters.text)
-def tvname(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
-
+async def tvname(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+    user_id = message.from_user.id
+    first_name = message.from_user.first_name
+    last_name = message.from_user.last_name
+    username = message.from_user.username
+    user_mention = message.from_user.mention
     search = message.text
+    is_member = await is_user_member(client, user_id)
+    await search.delete()
+
+    if not is_member:
+        join_button1 = InlineKeyboardButton("CHANNEL 1", url="https://t.me/movie_time_botonly")
+        join_button2 = InlineKeyboardButton("CHANNEL 2", url="https://t.me/+ExBm8lEipxRkMTA1")
+        reply_markup = InlineKeyboardMarkup([[join_button1],[join_button2]])
+        await message.reply_text("😈ʏᴏᴜ ᴍᴜsᴛ ᴊᴏɪɴ ᴍʏ ᴄʜᴀɴɴᴇʟs ᴛᴏ ᴜsᴇ ᴍᴇ😈.", reply_markup=reply_markup)
+        return
+    
+    
+
+
     tvs = [InlineKeyboardButton(text = x.get("name",x["channel"]),
                                 web_app=WebAppInfo(url = STREAM_LINK + "?url=" + x["url"]))
                                 for x in STREAMS if search.lower() in x.get("name",x["channel"]).lower()]

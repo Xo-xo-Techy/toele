@@ -93,7 +93,7 @@ async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_
 
     
     await app.send_message(message.chat.id,
-        f"__Hello {message.from_user.mention}, Watch IPTV streams right in Telegram App, send name of the channel bot will respond with available streams to watch, There are 6000+ online streams available from all over the world all the time.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
+        f"__Hello {message.from_user.mention}, Watch IPTV streams right in Telegram App, send name of the channel bot will respond with available streams to watch, There are 6000+ online streams available from all over the world all the time.Based in your area it will work.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
 
 @app.on_message(filters.command(["about"]))
 async def about_command(client,message):
@@ -151,13 +151,13 @@ async def tvname(client: pyrogram.client.Client, message: pyrogram.types.message
     
     print("Total Results for",search,"is",len(tvs))
     if len(tvs) == 0:
-        app.send_message(message.chat.id,"No Results Found",reply_to_message_id=message.id)
+       await app.send_message(message.chat.id,"No Results Found",reply_to_message_id=message.id)
         return
     
     main = []
     for i in range(0, len(tvs), COLMS): main.append(tvs[i:i+COLMS])
     
-    app.send_message(message.chat.id, '__Click on any one Channel__',
+    await app.send_message(message.chat.id, '__Click on any one Channel__',
     reply_to_message_id=message.id, reply_markup=InlineKeyboardMarkup(main[:ROWS]))
 
 

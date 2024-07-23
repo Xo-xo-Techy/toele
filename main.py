@@ -93,7 +93,7 @@ async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_
 
     
     await app.send_message(message.chat.id,
-        f"__Hello {message.from_user.mention},\nWatch IPTV streams right in Telegram App, send name of the channel bot will respond with available streams to watch,\nThere are 6000+ online streams available from all over the world all the time.Based in your area it will work.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
+        f"__Hello {message.from_user.mention},\nWatch TV streams right in Telegram App, send name of the TV channel bot will respond withilable streams to watch,\nThere are 6000+ online streams available from all over the world all the time.Based in your area it will work.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
 
 @app.on_message(filters.command(["about"]))
 async def about_command(client,message):

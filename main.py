@@ -15,14 +15,14 @@ with open('config.json', 'r') as f: CONFIGDATA = json.load(f)
 TOKEN = os.environ.get("TOKEN") or CONFIGDATA.get("TOKEN", "")
 HASH = os.environ.get("HASH") or CONFIGDATA.get("HASH", "")
 ID = os.environ.get("ID") or CONFIGDATA.get("ID", "")
-fsub_id = environ.get('FSUB_ID', '-1001678093514')
+fsub_id = os.environ.get('FSUB_ID', '-1001678093514')
 if len(fsub_id) == 0:
     logging.error("FSUB_ID variable is missing! Exiting now")
     exit(1)
 else:
     fsub_id = int(fsub_id)
 
-fsub_id2 = environ.get('FSUB_ID2', '-1001855342933')
+fsub_id2 = os.environ.get('FSUB_ID2', '-1001855342933')
 if len(fsub_id2) == 0:
     logging.error("FSUB_ID2 variable is missing! Exiting now")
     exit(1)

@@ -169,7 +169,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def health_check():
-    return "SCRAPPER Healthy", 200
+    return "ipman Healthy", 200
 
 @app.route('/set_webhook', methods=['GET'])
 def set_webhook():
@@ -177,9 +177,10 @@ def set_webhook():
 
 def run_flask():
     app.run(host='0.0.0.0', port=8080)
-    
+    print("flask1")
 def run_bot():
     bot.run()
+    print("bot initiated")
      
 
 if __name__ == "__main__":

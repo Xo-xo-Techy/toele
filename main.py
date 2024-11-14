@@ -1,6 +1,7 @@
 from pyrogram.types import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
 import os, pyrogram, json
 from pyrogram import Client, filters
+from flask import Flask
 from pyrogram.enums import ChatMemberStatus
 from requests import get
 import logging
@@ -28,7 +29,7 @@ if len(fsub_id2) == 0:
     exit(1)
 else:
     fsub_id2 = int(fsub_id2)
-app = Client("my_bot", api_id=ID, api_hash=HASH, bot_token=TOKEN)
+bot = Client("my_bot", api_id=ID, api_hash=HASH, bot_token=TOKEN)
 
 # channles
 CHANNELS = get("https://iptv-org.github.io/api/channels.json").json()
@@ -69,7 +70,7 @@ async def is_user_member(client, user_id):
     except Exception as e:
         logging.error(f"Error checking membership status for user {user_id}: {e}")
         return False
-@app.on_message(filters.command(["start"]))
+@bot.on_message(filters.command(["start"]))
 async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
     user_id = message.from_user.id
     first_name = message.from_user.first_name
@@ -95,7 +96,7 @@ async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_
     await app.send_message(message.chat.id,
         f"__Hello {message.from_user.mention},\nWatch TV streams right in Telegram App, send name of the TV channel bot will respond withilable streams to watch,\nThere are 6000+ online streams available from all over the world all the time.Based in your area it will work.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
 
-@app.on_message(filters.command(["about"]))
+@bot.on_message(filters.command(["about"]))
 async def about_command(client,message):
     text = f"""
 🌀 ᴄʜᴀɴɴᴇʟ : <a href="https://t.me/MOVIE_Time_BotOnly">​🇹​​🇷​​🇺​​🇲​​🇧​​🇴​​🇹​​🇸</a>
@@ -125,7 +126,7 @@ async def about_command(client,message):
     await x.delete()
 
 # text
-@app.on_message(filters.text)
+@bot.on_message(filters.text)
 async def tvname(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
     user_id = message.from_user.id
     first_name = message.from_user.first_name
@@ -162,4 +163,31 @@ async def tvname(client: pyrogram.client.Client, message: pyrogram.types.message
 
 
 # infinty polling
-app.run()
+# app.run()
+import threading
+app = Flask(__name__)
+
+@app.route('/')
+def health_check():
+    return "SCRAPPER Healthy", 200
+
+@app.route('/set_webhook', methods=['GET'])
+def set_webhook():
+    return "Webhook set!", 200
+
+def run_flask():
+    app.run(host='0.0.0.0', port=8080)
+    
+def run_bot():
+    bot.run()
+     
+
+if __name__ == "__main__":
+    print("Starting the bot and Flask app...")
+
+    # Start the bot in a separate thread
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.start()
+
+    # Start the bot in the main thread
+    run_bot() 

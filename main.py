@@ -16,7 +16,7 @@ with open('config.json', 'r') as f: CONFIGDATA = json.load(f)
 TOKEN = os.environ.get("TOKEN") or CONFIGDATA.get("TOKEN", "")
 HASH = os.environ.get("HASH") or CONFIGDATA.get("HASH", "")
 ID = os.environ.get("ID") or CONFIGDATA.get("ID", "")
-ADMIN_USER_IDS=os.environ.get("ADMIN_USER_IDS") or CONFIGDATA.get("ADMIN_USER_IDS","")
+ADMIN_USER_IDS=[945284066]
 fsub_id = os.environ.get('FSUB_ID', '-1001678093514')
 user_ids = set() 
 if len(fsub_id) == 0:

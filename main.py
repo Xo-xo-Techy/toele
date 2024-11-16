@@ -16,7 +16,9 @@ with open('config.json', 'r') as f: CONFIGDATA = json.load(f)
 TOKEN = os.environ.get("TOKEN") or CONFIGDATA.get("TOKEN", "")
 HASH = os.environ.get("HASH") or CONFIGDATA.get("HASH", "")
 ID = os.environ.get("ID") or CONFIGDATA.get("ID", "")
+ADMIN_USER_IDS=os.environ.get("ADMIN_USER_IDS") or CONFIGDATA.get("ADMIN_USER_IDS","")
 fsub_id = os.environ.get('FSUB_ID', '-1001678093514')
+user_ids = set() 
 if len(fsub_id) == 0:
     logging.error("FSUB_ID variable is missing! Exiting now")
     exit(1)
@@ -73,6 +75,7 @@ async def is_user_member(client, user_id):
 @bot.on_message(filters.command(["start"]))
 async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
     user_id = message.from_user.id
+    user_ids.add(user_id)
     first_name = message.from_user.first_name
     last_name = message.from_user.last_name
     username = message.from_user.username
@@ -95,6 +98,36 @@ async def echo(client: pyrogram.client.Client, message: pyrogram.types.messages_
     
     await bot.send_message(message.chat.id,
         f"__Hello {message.from_user.mention},\nWatch TV streams right in Telegram App, send name of the TV channel bot will respond withilable streams to watch,\nThere are 6000+ online streams available from all over the world all the time.Based in your area it will work.", reply_to_message_id=message.id, disable_web_page_preview=True, reply_markup=reply_markup)
+
+@bot.on_message(filters.command(["broadcast"]))
+
+async def broadcast_command(client, message):
+
+    if message.from_user.id not in ADMIN_USER_IDS:  # Check if the user is an admin
+
+        await message.reply_text("You are not authorized to use this command.")
+
+        return
+
+
+    # Broadcast message to all users
+
+    broadcast_text = message.text.split(" ", 1)[1] if len(message.text.split(" ")) > 1 else "No message provided."
+
+    for user_id in user_ids:
+
+        try:
+
+            await client.send_message(user_id, broadcast_text)
+
+        except Exception as e:
+
+            logging.error(f"Failed to send message to {user_id}: {e}")
+
+
+    await message.reply_text("Broadcast message sent!")
+
+
 
 @bot.on_message(filters.command(["about"]))
 async def about_command(client,message):
